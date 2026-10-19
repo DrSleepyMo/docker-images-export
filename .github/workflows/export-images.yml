@@ -1,0 +1,26 @@
+name: Export Docker Images
+
+on:
+  workflow_dispatch:
+
+jobs:
+  export-images:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Pull Docker images
+        run: |
+          docker pull --platform linux/amd64 python:3.12-slim
+          docker pull --platform linux/amd64 postgres:16
+
+      - name: Save Docker images
+        run: |
+          docker save python:3.12-slim postgres:16 | gzip > course-images.tar.gz
+          ls -lh course-images.tar.gz
+
+      - name: Upload Docker images
+        uses: actions/upload-artifact@v4
+        with:
+          name: course-images
+          path: course-images.tar.gz
+          retention-days: 7
